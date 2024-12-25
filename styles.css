@@ -1,0 +1,299 @@
+/* Variables de colores */
+:root {
+    --fondo: #fffcf9;
+    --fondo-secundario: #f3f3f3;
+    --primario: #0066b9;
+    --secundario: #243a5f;
+    --texto: #05161e;
+    --exito: #3dbb61;
+    --error: #e63946;
+    --advertencia: #ffa600;
+
+    /* Tipografía */
+    --fuente-principal: 'Ubuntu', sans-serif;
+
+    /* Tamaños de texto */
+    --h1: 2.8rem;
+    --h2: 1.8rem;
+    --h3: 1.6rem;
+    --p-a: 1.6rem;
+}
+
+/* Globales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--fuente-principal);
+    background-color: var(--fondo);
+    color: var(--texto);
+    line-height: 1.6;
+}
+
+/* Encabezados */
+h1 {
+    font-size: var(--h1);
+    color: var(--primario);
+}
+
+h2 {
+    font-size: var(--h2);
+    color: var(--secundario);
+}
+
+h3 {
+    font-size: var(--h3);
+    color: var(--texto);
+}
+
+/* Texto y enlaces */
+p {
+    font-size: var(--p-a);
+}
+
+a {
+    font-size: var(--p-a);
+    color: var(--primario);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--secundario);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: var(--p-a);
+    background-color: var(--fondo-secundario);
+    padding: 10px 0;
+    color: var(--secundario);
+}
+
+/* Barra superior (Header) */
+.barra-superior {
+    background-color: var(--secundario);
+    text-align: center;
+    padding: 1rem 0; /* Espaciado vertical */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para profundidad */
+}
+.barra-superior h1 { color: var(--fondo);}
+
+/* Sección principal */
+.section_principal {
+    background-color: var(--fondo); /* Fondo claro */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra alrededor */
+    margin: 2rem auto; /* Espaciado superior e inferior */
+    width: 80%; /* Ocupa el 80% del ancho de la ventana */
+    padding: 2rem; /* Espaciado interno */
+    border-radius: 8px; /* Bordes suaves */
+}
+
+/* Encabezados y texto dentro de la sección */
+.section_principal h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--primario);
+}
+
+.section_principal p {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.section_principal a {
+    display: inline-block;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--primario);
+    color: var(--fondo); /* Blanco */
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.section_principal a:hover {
+    background-color: var(--secundario);
+}
+
+
+/* Estilos generales del formulario */
+form#conf_xml {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: var(--fondo-secundario);
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Labels y selects */
+form#conf_xml label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--texto);
+}
+
+form#conf_xml select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--primario);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Grupo de checkboxes */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+
+.checkbox-group label {
+    font-size: 1rem;
+    color: var(--texto);
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+/* Botón de envío (opcional para futuros ajustes) */
+form#conf_xml button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--primario);
+    color: var(--fondo);
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form#conf_xml button:hover {
+    background-color: var(--secundario);
+}
+
+/* Grupo de selects en dos columnas */
+.select-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas iguales */
+    gap: 0.2rem; /* Espaciado entre columnas y filas */
+    margin-bottom: 0.2rem; /* Espaciado inferior para separar del resto */
+}
+
+.select-group label {
+    font-size: 1.4rem;
+    color: var(--texto);
+    margin-bottom: 0.0rem; /* Espaciado entre label y select */
+}
+
+.select-group select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1.4rem;
+    border: 1px solid var(--primario);
+    border-radius: 4px;
+}
+
+
+/* Sección de subida de archivos */
+.section_subir_archivos {
+    background-color: var(--fondo-secundario);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    padding: 2rem;
+    width: 80%;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.section_subir_archivos h2 {
+    color: var(--primario);
+    margin-bottom: 1rem;
+}
+
+.section_subir_archivos p {
+    margin-bottom: 1rem;
+    color: var(--texto);
+}
+
+/* Área de subida */
+.upload-area {
+    background-color: var(--fondo);
+    border: 2px dashed var(--primario);
+    border-radius: 8px;
+    padding: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.upload-area:hover {
+    background-color: var(--fondo-secundario);
+    border-color: var(--secundario);
+}
+
+.upload-area p {
+    margin: 0;
+    color: var(--texto);
+}
+
+/* Botón de selección */
+#upload-button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--primario);
+    color: var(--fondo);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#upload-button:hover {
+    background-color: var(--secundario);
+}
+
+/* Lista de archivos */
+#file-list {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: var(--texto);
+}
+
+/* Efecto al arrastrar archivos sobre el área */
+.upload-area.dragover {
+    background-color: var(--fondo-secundario);
+    border-color: var(--secundario);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#process-button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--primario);
+    color: var(--fondo);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: not-allowed; /* Inicialmente deshabilitado */
+    opacity: 0.6; /* Visualmente deshabilitado */
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+#process-button.enabled {
+    cursor: pointer;
+    opacity: 1;
+}
+
+#process-button:hover.enabled {
+    background-color: var(--secundario);
+}

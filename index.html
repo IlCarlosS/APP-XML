@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación Web - Facturas XML</title>
+    <!-- Fuente Ubuntu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="/icono/favicon.ico">
+</head>
+    <body>
+        <header class="barra-superior">
+            <h1>Gestión de Facturas XML</h1>
+        </header>
+        <main>
+            <section class="section_principal">
+                <h2>Sube tus archivos XML</h2>
+                <p>Selecciona la configuración de lectura de XML</p>
+                <form action="" id="conf_xml">
+                    <div class="select-group">
+                    
+                        <!-- Select: Tipo de factura -->
+                        <label for="tipo_factura">Tipo de factura:</label>
+                        <select name="tipo_factura" id="tipo_factura">
+                            <option value="ingreso_egreso">Ingreso y Egreso</option>
+                            <option value="ingreso">Ingreso</option>
+                            <option value="egreso">Egreso</option>
+                            <option value="pago">Pago</option>
+                            <option value="nomina">Nómina</option>
+                        </select>
+
+                        <!-- Select: Factura -->
+                        <label for="factura">Factura:</label>
+                        <select name="factura" id="factura">
+                            <option value="emitida">Emitida</option>
+                            <option value="recibida">Recibida</option>
+                        </select>
+                    </div>
+            
+                    <!-- Checkbox: Orden -->
+                    <p>Orden:</p>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="orden" value="folio_fiscal"> Folio Fiscal</label>
+                        <label><input type="checkbox" name="orden" value="folio"> Folio</label>
+                        <label><input type="checkbox" name="orden" value="fecha_emision"> Fecha Emisión</label>
+                        <label><input type="checkbox" name="orden" value="rfc"> RFC</label>
+                        <label><input type="checkbox" name="orden" value="nombre"> Nombre</label>
+                        <label><input type="checkbox" name="orden" value="metodo_pago"> Método de Pago</label>
+                        <label><input type="checkbox" name="orden" value="forma_pago"> Forma de Pago</label>
+                        <label><input type="checkbox" name="orden" value="total"> Total</label>
+                        <label><input type="checkbox" name="orden" value="subtotal"> Subtotal</label>
+                        <label><input type="checkbox" name="orden" value="iva"> IVA</label>
+                        <label><input type="checkbox" name="orden" value="ieps"> IEPS</label>
+                        <label><input type="checkbox" name="orden" value="ret_isr"> Ret ISR</label>
+                        <label><input type="checkbox" name="orden" value="ret_iva"> Ret IVA</label>
+                        <label><input type="checkbox" name="orden" value="descuento"> Descuento</label>
+                    </div>
+                </form>
+                
+            </section>
+
+            <section class="section_subir_archivos">
+                <h2>Selecciona tus archivos XML</h2>
+                <p>Arrastra tus archivos aquí o haz clic en el botón para seleccionarlos.</p>
+                <div class="upload-area" id="upload-area">
+                    <p>Arrastra tus archivos aquí</p>
+                    <button type="button" id="upload-button">Seleccionar archivos</button>
+                    <input type="file" id="file-input" multiple hidden>
+                </div>
+                <p id="file-list">No hay archivos seleccionados.</p>
+                <button type="button" id="process-button" disabled>Analizar XML y Descargar Excel</button>
+            </section>
+            
+        </main>
+        <footer>
+            <p>© 2024 - Aplicación Web de Facturas XML</p>
+        </footer>
+
+        <!-- Script -->
+        <script src="scripts.js"></script>
+        <script src="xml.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        <script src="export.js"></script>
+    </body>
+</html>
