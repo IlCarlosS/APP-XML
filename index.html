@@ -15,6 +15,14 @@
     <body>
         <header class="barra-superior">
             <h1>Gestión de Facturas XML</h1>
+            <button id="help-button" class="help-icon" aria-label="Ayuda">
+                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#e63946" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-help">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                    <path d="M12 17l0 .01" />
+                    <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" />
+                </svg>
+            </button>
         </header>
         <main>
             <section class="section_principal">
@@ -30,7 +38,7 @@
                             <option value="ingreso">Ingreso</option>
                             <option value="egreso">Egreso</option>
                             <option value="pago">Pago</option>
-                            <option value="nomina">Nómina</option>
+                            <!-- <option value="nomina">Nómina</option> -->
                         </select>
 
                         <!-- Select: Factura -->
@@ -79,6 +87,19 @@
         <footer>
             <p>© 2024 - Aplicación Web de Facturas XML</p>
         </footer>
+
+        <!-- Modal de Ayuda -->
+        <div id="help-modal" class="modal hidden">
+            <div class="modal-content">
+                <span id="close-modal" class="close-button">&times;</span>
+                <h2>Instrucciones</h2>
+                <p>1. Selecciona el tipo de factura que deseas analizar (ingreso, egreso, pago, etc.).</p>
+                <p>2. Elige si la factura es emitida o recibida.</p>
+                <p>3. Marca los datos que deseas extraer (Folio Fiscal, RFC, IVA, etc.).</p>
+                <p>4. Sube tus archivos XML arrastrándolos o seleccionándolos con el botón.</p>
+                <p>5. Presiona "Analizar XML y Descargar Excel" para generar el archivo.</p>
+            </div>
+        </div>
 
         <!-- Script -->
         <script src="scripts.js"></script>

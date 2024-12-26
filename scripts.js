@@ -170,3 +170,25 @@ function handleFiles(files) {
         alert("Se eliminaron archivos duplicados.");
     }
 }
+
+// Referencias al botón de ayuda y al modal
+const helpButton = document.getElementById("help-button");
+const helpModal = document.getElementById("help-modal");
+const closeModal = document.getElementById("close-modal");
+
+// Mostrar el modal
+helpButton.addEventListener("click", () => {
+    helpModal.style.display = "flex"; // Cambiamos la visibilidad del modal
+});
+
+// Cerrar el modal
+closeModal.addEventListener("click", () => {
+    helpModal.style.display = "none"; // Ocultamos el modal
+});
+
+// Cerrar el modal al hacer clic fuera de él
+window.addEventListener("click", (e) => {
+    if (e.target === helpModal) {
+        helpModal.style.display = "none";
+    }
+});
