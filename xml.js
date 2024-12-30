@@ -36,7 +36,7 @@ function procesarArchivosXML(files, tipoComprobanteSeleccionado) {
                 // Verificar errores de parsing
                 const parseError = xmlDoc.getElementsByTagName("parsererror");
                 if (parseError.length > 0) {
-                    console.error(`Error al parsear el archivo ${file.name}`);
+                    alert(`Error al parsear el archivo: ${file.name}. Verifique que el archivo sea válido.`);
                     archivosIgnorados.push(file.name);
                     return;
                 }
@@ -47,13 +47,17 @@ function procesarArchivosXML(files, tipoComprobanteSeleccionado) {
                 for (const comprobante of comprobantes) {
                     const tipo = comprobante.getAttribute("TipoDeComprobante");
 
-                    if (tipo === "P") {
-                        // Procesar pagos
-                        const datosPago = extraerDatosPagos(comprobante);
-                        resultadosConsolidados.push({ ...datosPago, Archivo: file.name });
-                    } else if (esComprobanteValido(tipo, tipoComprobanteSeleccionado)) {
-                        // Procesar otros tipos de comprobantes (I, E, etc.)
-                        const datos = extraerDatos(comprobante);
+                    // Ignorar nóminas si no se selecciona explícitamente "Nómina"
+                    if (tipo === "N" && tipoComprobanteSeleccionado !== "nomina") {
+                        continue;
+                    }
+
+                    // Verificar si el comprobante es válido según la selección
+                    if (esComprobanteValido(tipo, tipoComprobanteSeleccionado)) {
+                        const datos = tipo === "P"
+                            ? extraerDatosPagos(comprobante)
+                            : extraerDatos(comprobante);
+
                         resultadosConsolidados.push({ ...datos, Archivo: file.name });
                     }
                 }
@@ -61,14 +65,13 @@ function procesarArchivosXML(files, tipoComprobanteSeleccionado) {
                 // Exportar a Excel si es el último archivo procesado
                 if (index === files.length - 1) {
                     if (resultadosConsolidados.length > 0) {
-                        //console.table(resultadosConsolidados);
                         exportarAExcel(resultadosConsolidados, "resultados_consolidados.xlsx");
                     } else {
                         alert("No se encontraron datos válidos para exportar.");
                     }
                 }
             } catch (error) {
-                console.error(`Error al procesar el archivo ${file.name}:`, error);
+                alert(`Error al procesar el archivo: ${file.name}. Detalles: ${error.message}`);
                 archivosIgnorados.push(file.name);
             }
         };
@@ -87,7 +90,7 @@ function obtenerDescripcionFormaPago(clave) {
     const tablaFormaPago = {
         "01": "EFECTIVO",
         "02": "CHEQUE NOMINATIVO",
-        "03": "TRANSFERENCIA ELECTRÓNICA DE FONDOS",
+        "03": "TRANSFERENCIA",
         "04": "TARJETA DE CRÉDITO",
         "05": "MONEDERO ELECTRÓNICO",
         "06": "DINERO ELECTRÓNICO",
