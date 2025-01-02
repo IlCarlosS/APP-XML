@@ -193,43 +193,56 @@ function extraerDatos(comprobante) {
     }
 
     // Extraer los impuestos totales del comprobante
-const impuestos = Array.from(comprobante.children).find((nodo) => 
+    const impuestos = Array.from(comprobante.children).find((nodo) => 
     nodo.nodeName === "cfdi:Impuestos"
-);
+    );
 
-if (impuestos) {
-    // Extracción de Traslados
-    if (checkboxesSeleccionados.includes("iva") || checkboxesSeleccionados.includes("ieps")) {
-        const traslados = impuestos.getElementsByTagName("cfdi:Traslado");
-        for (const traslado of traslados) {
-            const impuesto = traslado.getAttribute("Impuesto");
-            const importe = traslado.getAttribute("Importe");
+    if (impuestos) {
+        // Inicializar acumuladores para impuestos
+        let totalIVA = 0;
+        let totalIEPS = 0;
 
-            if (impuesto === "002" && checkboxesSeleccionados.includes("iva")) {
-                datos["IVA"] = importe || "No disponible";
+        // Extracción de Traslados
+        if (checkboxesSeleccionados.includes("iva") || checkboxesSeleccionados.includes("ieps")) {
+            const traslados = impuestos.getElementsByTagName("cfdi:Traslado");
+            for (const traslado of traslados) {
+                const impuesto = traslado.getAttribute("Impuesto");
+                const importe = parseFloat(traslado.getAttribute("Importe")) || 0;
+
+                if (impuesto === "002" && checkboxesSeleccionados.includes("iva")) {
+                    totalIVA += importe; // Acumular IVA
+                }
+                if (impuesto === "003" && checkboxesSeleccionados.includes("ieps")) {
+                    totalIEPS += importe; // Acumular IEPS
+                }
             }
-            if (impuesto === "003" && checkboxesSeleccionados.includes("ieps")) {
-                datos["IEPS"] = importe || "No disponible";
+        }
+
+        // Asignar los totales acumulados
+        if (checkboxesSeleccionados.includes("iva")) {
+            datos["IVA"] = totalIVA > 0 ? totalIVA.toFixed(2) : "No disponible";
+        }
+        if (checkboxesSeleccionados.includes("ieps")) {
+            datos["IEPS"] = totalIEPS > 0 ? totalIEPS.toFixed(2) : "No disponible";
+        }
+
+        // Extracción de Retenciones
+        if (checkboxesSeleccionados.includes("ret_isr") || checkboxesSeleccionados.includes("ret_iva")) {
+            const retenciones = impuestos.getElementsByTagName("cfdi:Retencion");
+            for (const retencion of retenciones) {
+                const impuesto = retencion.getAttribute("Impuesto");
+                const importe = parseFloat(retencion.getAttribute("Importe")) || 0;
+
+                if (impuesto === "001" && checkboxesSeleccionados.includes("ret_isr")) {
+                    datos["Ret ISR"] = importe > 0 ? importe.toFixed(2) : "No disponible";
+                }
+                if (impuesto === "002" && checkboxesSeleccionados.includes("ret_iva")) {
+                    datos["Ret IVA"] = importe > 0 ? importe.toFixed(2) : "No disponible";
+                }
             }
         }
     }
 
-    // Extracción de Retenciones
-    if (checkboxesSeleccionados.includes("ret_isr") || checkboxesSeleccionados.includes("ret_iva")) {
-        const retenciones = impuestos.getElementsByTagName("cfdi:Retencion");
-        for (const retencion of retenciones) {
-            const impuesto = retencion.getAttribute("Impuesto");
-            const importe = retencion.getAttribute("Importe");
-
-            if (impuesto === "001" && checkboxesSeleccionados.includes("ret_isr")) {
-                datos["Ret ISR"] = importe || "No disponible";
-                }
-            if (impuesto === "002" && checkboxesSeleccionados.includes("ret_iva")) {
-                datos["Ret IVA"] = importe || "No disponible";
-                }
-            }
-        }
-    }
     // Descuento
     if (checkboxesSeleccionados.includes("descuento")) {
         datos["Descuento"] = comprobante.getAttribute("Descuento") || "No disponible";
