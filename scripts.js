@@ -171,24 +171,30 @@ function handleFiles(files) {
     }
 }
 
-// Referencias al botón de ayuda y al modal
-const helpButton = document.getElementById("help-button");
-const helpModal = document.getElementById("help-modal");
-const closeModal = document.getElementById("close-modal");
+// Función para manejar modales
+function manejarModal(botonId, modalId, closeId) {
+    const boton = document.getElementById(botonId);
+    const modal = document.getElementById(modalId);
+    const close = document.getElementById(closeId);
 
-// Mostrar el modal
-helpButton.addEventListener("click", () => {
-    helpModal.style.display = "flex"; // Cambiamos la visibilidad del modal
-});
+    // Mostrar el modal
+    boton.addEventListener("click", () => {
+        modal.style.display = "flex"; // Mostrar modal
+    });
 
-// Cerrar el modal
-closeModal.addEventListener("click", () => {
-    helpModal.style.display = "none"; // Ocultamos el modal
-});
+    // Cerrar el modal al presionar el botón de cierre
+    close.addEventListener("click", () => {
+        modal.style.display = "none"; // Ocultar modal
+    });
 
-// Cerrar el modal al hacer clic fuera de él
-window.addEventListener("click", (e) => {
-    if (e.target === helpModal) {
-        helpModal.style.display = "none";
-    }
-});
+    // Cerrar el modal al hacer clic fuera de él
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+}
+
+// Manejar ambos modales
+manejarModal("help-button", "help-modal", "close-modal");
+manejarModal("usage-button", "usage-modal", "close-usage-modal");

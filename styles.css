@@ -351,3 +351,23 @@ form#conf_xml button:hover {
     color: var(--texto, #333);
     cursor: pointer;
 }
+
+
+
+/* Estilo del botón de aviso en el footer */
+.footer-button {
+    background-color: transparent;
+    border: none;
+    color: var(--primario, #0066b9);
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.footer-button:hover {
+    color: var(--secundario, #243a5f);
+    text-decoration: none;
+}
+
+
