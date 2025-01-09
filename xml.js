@@ -268,7 +268,7 @@ function extraerDatosPagos(comprobante) {
     // Fecha
     datos["Fecha"] = comprobante.getAttribute("Fecha") || "No disponible";
 
-    // RFC y Nombre (según el tipo de factura)
+    // RFC y Nombre
     const tipoFactura = document.getElementById("factura").value;
     const entidad = tipoFactura === "emitida"
         ? comprobante.getElementsByTagName("cfdi:Receptor")[0]
@@ -290,17 +290,8 @@ function extraerDatosPagos(comprobante) {
             // Pago Individual
             const pago = pagos.getElementsByTagName("pago20:Pago")[0];
             if (pago) {
-                const formaDePagoPClave = pago.getAttribute("FormaDePagoP");
-                datos["FormaDePagoP"] = obtenerDescripcionFormaPago(formaDePagoPClave);
-                datos["FechaPago"] = pago.getAttribute("FechaPago") || "No disponible";
-            } else {
-                datos["FormaDePagoP"] = "No disponible";
-                datos["FechaPago"] = "No disponible";
+                datos["MontoTotalPagos"] = parseFloat(pago.getAttribute("Monto") || 0);
             }
-
-            // Monto Total Pagos
-            const totales = pagos.getElementsByTagName("pago20:Totales")[0];
-            datos["MontoTotalPagos"] = parseFloat(totales?.getAttribute("MontoTotalPagos") || 0);
 
             // Impuestos (ImpuestosP)
             const impuestosP = pagos.getElementsByTagName("pago20:ImpuestosP")[0];
@@ -337,14 +328,17 @@ function extraerDatosPagos(comprobante) {
             // Cálculo del Subtotal
             const montoTotal = datos["MontoTotalPagos"];
             const iva = datos["IVA"];
+            const ieps = datos["IEPS"];
             const isr = datos["ISR"];
 
-            if (iva > 0 && isr > 0) {
-                datos["Subtotal"] = montoTotal - iva + isr;
-            } else if (iva > 0) {
-                datos["Subtotal"] = montoTotal - iva;
+            if (montoTotal > 0) {
+                if (iva > 0 || ieps > 0) {
+                    datos["Subtotal"] = (montoTotal - iva - ieps + isr).toFixed(2);
+                } else {
+                    datos["Subtotal"] = (montoTotal + isr).toFixed(2); // Caso sin IVA ni IEPS
+                }
             } else {
-                datos["Subtotal"] = montoTotal; // Sin IVA ni ISR
+                datos["Subtotal"] = "No disponible";
             }
         }
     }

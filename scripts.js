@@ -7,23 +7,41 @@ const fileInput = document.getElementById("file-input");
 const uploadArea = document.getElementById("upload-area");
 const fileListDisplay = document.getElementById("file-list");
 const processButton = document.getElementById("process-button");
+// Referencias a los checkboxes
+const selectAllCheckbox = document.getElementById("select-all");
+const selectTaxesCheckbox = document.getElementById("select-taxes");
+const allCheckboxes = document.querySelectorAll('input[name="orden"]');
 
 // Variable para almacenar los archivos seleccionados
 let selectedFiles = [];
 
 // Función para habilitar/deshabilitar los checkboxes
 function toggleCheckboxes() {
-    if (tipoFacturaSelect.value === "pago" || tipoFacturaSelect.value === "nomina") {
-        checkboxes.forEach((checkbox) => {
-            checkbox.disabled = true;
-            checkbox.checked = false; // Asegurar que ninguno esté seleccionado
-        });
-    } else {
-        checkboxes.forEach((checkbox) => {
-            checkbox.disabled = false;
-        });
+    const tipoFactura = document.getElementById("tipo_factura").value;
+    const disable = tipoFactura === "pago"; // Desactivar si es "pago"
+
+    // Desactivar/activar todos los checkboxes
+    allCheckboxes.forEach((checkbox) => {
+        checkbox.disabled = disable;
+        if (disable) {
+            checkbox.checked = false; // Deseleccionar si se desactivan
+        }
+    });
+
+    // Desactivar/activar "Seleccionar Todo" y "Seleccionar Todos los Impuestos"
+    selectAllCheckbox.disabled = disable;
+    selectTaxesCheckbox.disabled = disable;
+    if (disable) {
+        selectAllCheckbox.checked = false;
+        selectTaxesCheckbox.checked = false;
     }
 }
+
+// Llamada inicial para establecer el estado correcto al cargar la página
+toggleCheckboxes();
+
+// Evento para manejar cambios en el select "tipo_factura"
+document.getElementById("tipo_factura").addEventListener("change", toggleCheckboxes);
 
 // Evento al cambiar la selección de tipo de factura
 tipoFacturaSelect.addEventListener("change", toggleCheckboxes);
@@ -31,9 +49,45 @@ tipoFacturaSelect.addEventListener("change", toggleCheckboxes);
 // Llamada inicial para establecer el estado correcto
 toggleCheckboxes();
 
+
+// Función para seleccionar/deseleccionar todos los checkboxes
+selectAllCheckbox.addEventListener("change", () => {
+    allCheckboxes.forEach((checkbox) => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+    // Asegurarse de sincronizar "Seleccionar Todos los Impuestos"
+    selectTaxesCheckbox.checked = selectAllCheckbox.checked;
+});
+
+// Función para seleccionar/deseleccionar solo los impuestos
+selectTaxesCheckbox.addEventListener("change", () => {
+    const taxCheckboxes = document.querySelectorAll(
+        'input[name="orden"][value="iva"], input[name="orden"][value="ieps"], input[name="orden"][value="ret_isr"], input[name="orden"][value="ret_iva"]'
+    );
+    taxCheckboxes.forEach((checkbox) => {
+        checkbox.checked = selectTaxesCheckbox.checked;
+    });
+});
+
+// Sincronizar "Seleccionar Todo" con los cambios en los checkboxes individuales
+allCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+        const allChecked = Array.from(allCheckboxes).every((cb) => cb.checked);
+        selectAllCheckbox.checked = allChecked;
+
+        const taxCheckboxes = Array.from(
+            document.querySelectorAll(
+                'input[name="orden"][value="iva"], input[name="orden"][value="ieps"], input[name="orden"][value="ret_isr"], input[name="orden"][value="ret_iva"]'
+            )
+        );
+        const allTaxesChecked = taxCheckboxes.every((cb) => cb.checked);
+        selectTaxesCheckbox.checked = allTaxesChecked;
+    });
+});
+
 // Función para validar archivos
 function validateFiles(files) {
-    const maxFiles = 300;
+    const maxFiles = 500;
     const validFiles = [];
     const invalidFiles = [];
 
