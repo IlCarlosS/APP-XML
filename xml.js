@@ -290,6 +290,8 @@ function extraerDatosPagos(comprobante) {
             // Pago Individual
             const pago = pagos.getElementsByTagName("pago20:Pago")[0];
             if (pago) {
+                datos["FormaDePagoP"] = obtenerDescripcionFormaPago(pago.getAttribute("FormaDePagoP"));
+                datos["FechaPago"] = pago.getAttribute("FechaPago") || "No disponible"; // Extraer FechaPago
                 datos["MontoTotalPagos"] = parseFloat(pago.getAttribute("Monto") || 0);
             }
 
@@ -345,6 +347,3 @@ function extraerDatosPagos(comprobante) {
 
     return datos;
 }
-
-
-
