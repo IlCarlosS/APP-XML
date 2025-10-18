@@ -186,7 +186,6 @@ processButton.addEventListener("click", () => {
 // Referencias al select de factura y al checkbox de folio
 const facturaSelect = document.getElementById("factura");
 const folioCheckbox = document.querySelector('input[name="orden"][value="folio"]');
-
 // Función para habilitar/deshabilitar el checkbox de "Folio"
 function toggleFolioCheckbox() {
     if (facturaSelect.value === "recibida") {
@@ -206,7 +205,6 @@ toggleFolioCheckbox();
 // Función para manejar archivos seleccionados o arrastrados
 function handleFiles(files) {
     const { validFiles, invalidFiles } = validateFiles(files);
-
     // Eliminar duplicados basándose en el nombre del archivo
     const uniqueFiles = validFiles.filter(
         (file, index, self) =>
@@ -252,3 +250,31 @@ function manejarModal(botonId, modalId, closeId) {
 // Manejar ambos modales
 manejarModal("help-button", "help-modal", "close-modal");
 manejarModal("usage-button", "usage-modal", "close-usage-modal");
+
+// ==== CAMBIO DE TEMA ==== //
+const body = document.body;
+const themeToggle = document.getElementById('theme-toggle');
+const THEME_KEY = 'theme-preference';
+// Función para aplicar tema
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    body.classList.add('dark-mode');
+  } else {
+    body.classList.remove('dark-mode');
+  }
+}
+
+// Leer tema guardado o usar preferencia del sistema
+const savedTheme = localStorage.getItem(THEME_KEY);
+if (savedTheme) {
+  applyTheme(savedTheme);
+} else {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(prefersDark ? 'dark' : 'light');
+}
+
+// Alternar tema al presionar el botón
+themeToggle.addEventListener('click', () => {
+  const isDark = body.classList.toggle('dark-mode');
+  localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+});
