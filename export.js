@@ -2,7 +2,7 @@
 // Función para exportar datos a un archivo Excel
 function exportarAExcel(datos, nombreArchivo = "resultados.xlsx") {
     if (!datos || datos.length === 0) {
-        alert("No hay datos para exportar.");
+        showToast("No hay datos para exportar ⚠️", "error");
         return;
     }
 
@@ -15,4 +15,8 @@ function exportarAExcel(datos, nombreArchivo = "resultados.xlsx") {
 
     // Generar y descargar el archivo Excel
     XLSX.writeFile(libro, nombreArchivo);
+
+    // Toast de confirmación de descarga
+    showToast(`Archivo descargado correctamente ✅`, "exito");
 }
+

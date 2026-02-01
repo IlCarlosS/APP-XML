@@ -33,8 +33,8 @@
     --fuente-principal: 'Ubuntu', sans-serif;
     /* Tamaños de texto */
     --h1: 2.8rem;
-    --h2: 1.8rem;
-    --h3: 1.6rem;
+    --h2: 2.0rem;
+    --h3: 1.8rem;
     --p-a: 1.6rem;
 }
 
@@ -397,4 +397,64 @@ form#conf_xml button:hover {
 .footer-button:hover {
     color: var(--secundario, #243a5f);
     text-decoration: none;
+}
+
+/* TOAST---------------- */
+/* Contenedor de toasts */
+#toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  z-index: 9999;
+}
+
+/* Estilo base del toast */
+.toast {
+  font-family: var(--fuente-principal);
+  font-size: 1.2rem;
+  color: var(--texto);
+  background: var(--fondo-secundario);
+  border-radius: 6px;
+  padding: 0.8rem 1.2rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  min-width: 220px;
+  max-width: 300px;
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideIn 0.4s forwards, fadeOut 0.4s forwards 3s;
+}
+
+/* Variantes según tipo */
+.toast-exito {
+  border-left: 6px solid var(--exito);
+}
+
+.toast-error {
+  border-left: 6px solid var(--error);
+}
+
+.toast-advertencia {
+  border-left: 6px solid var(--advertencia);
+}
+
+.toast-info {
+  border-left: 6px solid var(--primario);
+}
+
+/* Animaciones */
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
 }

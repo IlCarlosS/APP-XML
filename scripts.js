@@ -167,8 +167,14 @@ function handleFiles(files) {
     selectedFiles = validFiles;
     updateFileListDisplay();
 
-    if (invalidFiles.length > 0) {
-        alert(`Los siguientes archivos no son válidos y serán ignorados:\n${invalidFiles.join("\n")}`);
+    if (invalidFiles.length > 0) { 
+        showToast( `Los siguientes archivos no son válidos y serán ignorados: ${invalidFiles.join(", ")}`,
+            "advertencia" 
+        ); 
+    } 
+    
+    if (validFiles.length > 0) { 
+        showToast(`Se cargaron ${validFiles.length} archivos XML correctamente ✅`, "exito"); 
     }
 }
 
@@ -176,12 +182,14 @@ function handleFiles(files) {
 processButton.addEventListener("click", () => {
     if (selectedFiles.length > 0) {
         const tipoComprobanteSeleccionado = tipoFacturaSelect.value;
-        procesarArchivosXML(selectedFiles, tipoComprobanteSeleccionado); // Llamar a la lógica en xml.js
+        procesarArchivosXML(selectedFiles, tipoComprobanteSeleccionado); // Lógica en xml.js
         console.log("Iniciando el procesamiento de XML...");
+        showToast("Procesando archivos... ⏳", "info");
     } else {
-        alert("No hay archivos para procesar.");
+        showToast("No hay archivos para procesar ⚠️", "error");
     }
 });
+
 
 // Referencias al select de factura y al checkbox de folio
 const facturaSelect = document.getElementById("factura");
@@ -214,13 +222,15 @@ function handleFiles(files) {
     selectedFiles = uniqueFiles;
     updateFileListDisplay();
 
-    if (invalidFiles.length > 0) {
-        alert(`Los siguientes archivos no son válidos y serán ignorados:\n${invalidFiles.join("\n")}`);
+    if (validFiles.length !== uniqueFiles.length) {
+        showToast(`Se eliminaron archivos XML duplicados ✅`, "exito");
     }
 
-    if (validFiles.length !== uniqueFiles.length) {
-        alert("Se eliminaron archivos duplicados.");
-    }
+    if (invalidFiles.length > 0) { 
+        showToast( `Los siguientes archivos no son válidos y serán ignorados: ${invalidFiles.join(", ")}`,
+            "advertencia" 
+        ); 
+    } 
 }
 
 // Función para manejar modales
@@ -278,3 +288,18 @@ themeToggle.addEventListener('click', () => {
   const isDark = body.classList.toggle('dark-mode');
   localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
 });
+
+// TOAST
+function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    // Remover después de la animación
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}

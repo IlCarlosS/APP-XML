@@ -36,7 +36,7 @@ function procesarArchivosXML(files, tipoComprobanteSeleccionado) {
                 // Verificar errores de parsing
                 const parseError = xmlDoc.getElementsByTagName("parsererror");
                 if (parseError.length > 0) {
-                    alert(`Error al parsear el archivo: ${file.name}. Verifique que el archivo sea válido.`);
+                    showToast(`Error al parsear el archivo: ${file.name}. Verifique que el archivo sea válido. ❌`, "error");
                     archivosIgnorados.push(file.name);
                     return;
                 }
@@ -67,15 +67,14 @@ function procesarArchivosXML(files, tipoComprobanteSeleccionado) {
                     if (resultadosConsolidados.length > 0) {
                         exportarAExcel(resultadosConsolidados, "resultados_consolidados.xlsx");
                     } else {
-                        alert("No se encontraron datos válidos para exportar.");
+                        showToast("No se encontraron datos válidos para exportar ⚠️", "advertencia");
                     }
                 }
             } catch (error) {
-                alert(`Error al procesar el archivo: ${file.name}. Detalles: ${error.message}`);
+                showToast(`Error al procesar el archivo: ${file.name}. Detalles: ${error.message}`, "error");
                 archivosIgnorados.push(file.name);
             }
         };
-
         reader.readAsText(file);
     });
 
