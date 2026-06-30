@@ -85,19 +85,186 @@ allCheckboxes.forEach((checkbox) => {
     });
 });
 
-// Función para validar archivos
-function validateFiles(files) {
+// // Función para validar archivos
+// function validateFiles(files) {
+//     const maxFiles = 500;
+//     const validFiles = [];
+//     const invalidFiles = [];
+
+//     Array.from(files).forEach((file) => {
+//         if (file.name.endsWith(".xml")) {
+//             validFiles.push(file);
+//         } else {
+//             invalidFiles.push(file.name);
+//         }
+//     });
+
+//     if (validFiles.length > maxFiles) {
+//         fileListDisplay.textContent = `Error: Solo se permiten un máximo de ${maxFiles} archivos XML.`;
+//         return { validFiles: [], invalidFiles };
+//     }
+
+//     if (validFiles.length === 0) {
+//         fileListDisplay.textContent = "Error: No se seleccionaron archivos XML válidos.";
+//         return { validFiles: [], invalidFiles };
+//     }
+
+//     return { validFiles, invalidFiles };
+// }
+
+// // Función para actualizar la lista de archivos y el estado del botón
+// function updateFileListDisplay() {
+//     if (selectedFiles.length > 0) {
+//         fileListDisplay.textContent = `Archivos seleccionados: ${selectedFiles.length}`;
+//         enableProcessButton();
+//     } else {
+//         fileListDisplay.textContent = "No hay archivos seleccionados.";
+//         disableProcessButton();
+//     }
+// }
+
+// // Funciones para habilitar/deshabilitar el botón "Analizar XML"
+// function enableProcessButton() {
+//     processButton.classList.add("enabled");
+//     processButton.disabled = false;
+// }
+
+// function disableProcessButton() {
+//     processButton.classList.remove("enabled");
+//     processButton.disabled = true;
+// }
+
+// // Evento al presionar el botón de cargar archivos
+// uploadButton.addEventListener("click", () => {
+//     fileInput.click();
+// });
+
+// // Evento al cambiar el input de archivos
+// fileInput.addEventListener("change", (e) => {
+//     handleFiles(e.target.files);
+// });
+
+// // Eventos para manejar el área de arrastrar y soltar
+// uploadArea.addEventListener("dragover", (e) => {
+//     e.preventDefault();
+//     uploadArea.classList.add("dragover");
+// });
+
+// uploadArea.addEventListener("dragleave", () => {
+//     uploadArea.classList.remove("dragover");
+// });
+
+// uploadArea.addEventListener("drop", (e) => {
+//     e.preventDefault();
+//     uploadArea.classList.remove("dragover");
+//     handleFiles(e.dataTransfer.files);
+// });
+
+// // Evento al hacer clic en "Analizar XML"
+// processButton.addEventListener("click", () => {
+//     if (selectedFiles.length > 0) {
+//         const tipoComprobanteSeleccionado = tipoFacturaSelect.value;
+//         procesarArchivosXML(selectedFiles, tipoComprobanteSeleccionado); // Lógica en xml.js
+//         console.log("Iniciando el procesamiento de XML...");
+//         showToast("Procesando archivos... ⏳", "info");
+//     } else {
+//         showToast("No hay archivos para procesar ⚠️", "error");
+//     }
+// });
+
+// // Referencias al select de factura y al checkbox de folio
+// const facturaSelect = document.getElementById("factura");
+// const folioCheckbox = document.querySelector('input[name="orden"][value="folio"]');
+// // Función para habilitar/deshabilitar el checkbox de "Folio"
+// function toggleFolioCheckbox() {
+//     if (facturaSelect.value === "recibida") {
+//         folioCheckbox.disabled = true;
+//         folioCheckbox.checked = false; // Asegurar que quede desmarcado
+//     } else {
+//         folioCheckbox.disabled = false;
+//     }
+// }
+
+// // Evento al cambiar el select "factura"
+// facturaSelect.addEventListener("change", toggleFolioCheckbox);
+
+// // Llamada inicial para establecer el estado correcto
+// toggleFolioCheckbox();
+
+// // Función para manejar archivos seleccionados o arrastrados
+// function handleFiles(files) {
+//     const { validFiles, invalidFiles } = validateFiles(files);
+//     // Eliminar duplicados basándose en el nombre del archivo
+//     const uniqueFiles = validFiles.filter(
+//         (file, index, self) =>
+//             index === self.findIndex((f) => f.name === file.name)
+//     );
+
+//     selectedFiles = uniqueFiles;
+//     updateFileListDisplay();
+
+//     if (validFiles.length !== uniqueFiles.length) {
+//         showToast(`Se eliminaron archivos XML duplicados ✅`, "exito");
+//     }
+
+//     if (invalidFiles.length > 0) { 
+//         showToast( `Los siguientes archivos no son válidos y serán ignorados: ${invalidFiles.join(", ")}`,
+//             "advertencia" 
+//         ); 
+//     } 
+// }
+
+// Función para validar archivos (Ahora es ASÍNCRONA para poder abrir el ZIP en memoria)
+async function validateFiles(files) {
     const maxFiles = 500;
     const validFiles = [];
     const invalidFiles = [];
+    const filesArray = Array.from(files);
 
-    Array.from(files).forEach((file) => {
-        if (file.name.endsWith(".xml")) {
+    // Si el usuario subió algún ZIP, le avisamos que estamos trabajando en ello
+    const contieneZip = filesArray.some(f => f.name.toLowerCase().endsWith(".zip"));
+    if (contieneZip) {
+        showToast("Descomprimiendo archivos ZIP... ⏳", "info");
+    }
+
+    for (const file of filesArray) {
+        // 1. Si es un archivo XML directo, se procesa igual que antes
+        if (file.name.toLowerCase().endsWith(".xml")) {
             validFiles.push(file);
-        } else {
+        } 
+        // 2. Si es un archivo ZIP, extraemos lo que tenga adentro
+        else if (file.name.toLowerCase().endsWith(".zip")) {
+            try {
+                const zip = new JSZip();
+                const zipContent = await zip.loadAsync(file); // Abrimos el ZIP
+                
+                // Revisamos cada archivo que viene dentro del ZIP
+                for (const relativePath in zipContent.files) {
+                    const zipEntry = zipContent.files[relativePath];
+                    
+                    // Si no es una carpeta y su nombre termina en .xml, lo extraemos
+                    if (!zipEntry.dir && zipEntry.name.toLowerCase().endsWith(".xml")) {
+                        const xmlString = await zipEntry.async("string"); // Extraemos el texto del XML
+                        
+                        // Creamos un archivo File virtual para que el resto de tu sistema lo lea normalmente
+                        const extractedFile = new File([xmlString], zipEntry.name, {
+                            type: "application/xml"
+                        });
+                        
+                        validFiles.push(extractedFile);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error al descomprimir ${file.name}:`, error);
+                showToast(`No se pudo leer el archivo ZIP: ${file.name} ❌`, "error");
+                invalidFiles.push(file.name);
+            }
+        } 
+        // 3. Si no es XML ni ZIP, se va a la lista de inválidos
+        else {
             invalidFiles.push(file.name);
         }
-    });
+    }
 
     if (validFiles.length > maxFiles) {
         fileListDisplay.textContent = `Error: Solo se permiten un máximo de ${maxFiles} archivos XML.`;
@@ -160,24 +327,6 @@ uploadArea.addEventListener("drop", (e) => {
     handleFiles(e.dataTransfer.files);
 });
 
-// Función para manejar archivos seleccionados o arrastrados
-function handleFiles(files) {
-    const { validFiles, invalidFiles } = validateFiles(files);
-
-    selectedFiles = validFiles;
-    updateFileListDisplay();
-
-    if (invalidFiles.length > 0) { 
-        showToast( `Los siguientes archivos no son válidos y serán ignorados: ${invalidFiles.join(", ")}`,
-            "advertencia" 
-        ); 
-    } 
-    
-    if (validFiles.length > 0) { 
-        showToast(`Se cargaron ${validFiles.length} archivos XML correctamente ✅`, "exito"); 
-    }
-}
-
 // Evento al hacer clic en "Analizar XML"
 processButton.addEventListener("click", () => {
     if (selectedFiles.length > 0) {
@@ -186,10 +335,9 @@ processButton.addEventListener("click", () => {
         console.log("Iniciando el procesamiento de XML...");
         showToast("Procesando archivos... ⏳", "info");
     } else {
-        showToast("No hay archivos para procesar ⚠️", "error");
+        showToast("No hay archivos para processar ⚠️", "error");
     }
 });
-
 
 // Referencias al select de factura y al checkbox de folio
 const facturaSelect = document.getElementById("factura");
@@ -210,9 +358,11 @@ facturaSelect.addEventListener("change", toggleFolioCheckbox);
 // Llamada inicial para establecer el estado correcto
 toggleFolioCheckbox();
 
-// Función para manejar archivos seleccionados o arrastrados
-function handleFiles(files) {
-    const { validFiles, invalidFiles } = validateFiles(files);
+// Función para manejar archivos seleccionados o arrastrados (Ahora es ASÍNCRONA)
+async function handleFiles(files) {
+    // Usamos 'await' porque validar ahora puede incluir descomprimir archivos ZIP
+    const { validFiles, invalidFiles } = await validateFiles(files);
+    
     // Eliminar duplicados basándose en el nombre del archivo
     const uniqueFiles = validFiles.filter(
         (file, index, self) =>
@@ -227,10 +377,14 @@ function handleFiles(files) {
     }
 
     if (invalidFiles.length > 0) { 
-        showToast( `Los siguientes archivos no son válidos y serán ignorados: ${invalidFiles.join(", ")}`,
+        showToast(`Los siguientes archivos no son válidos y serán ignorados: ${invalidFiles.join(", ")}`,
             "advertencia" 
         ); 
     } 
+    
+    if (uniqueFiles.length > 0) {
+        showToast(`Se cargaron ${uniqueFiles.length} archivos XML correctamente ✅`, "exito");
+    }
 }
 
 // Función para manejar modales

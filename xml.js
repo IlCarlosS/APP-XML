@@ -254,20 +254,16 @@ function extraerDatos(comprobante) {
 function extraerDatosPagos(comprobante) {
     const datos = {};
 
-    // Tipo de Comprobante
+    // 1. Datos Generales del Comprobante
     datos["Tipo"] = comprobante.getAttribute("TipoDeComprobante") || "No disponible";
-
-    // Folio Fiscal (UUID)
-    const timbreFiscal = comprobante.getElementsByTagName("tfd:TimbreFiscalDigital")[0];
-    datos["UUID"] = timbreFiscal ? timbreFiscal.getAttribute("UUID") || "-" : "No disponible";
-
-    // Folio
     datos["Folio"] = comprobante.getAttribute("Folio") || "-";
+    datos["Fecha Emisión"] = comprobante.getAttribute("Fecha") || "No disponible";
 
-    // Fecha
-    datos["Fecha"] = comprobante.getAttribute("Fecha") || "No disponible";
+    // 2. Folio Fiscal (UUID)
+    const timbreFiscal = comprobante.getElementsByTagName("tfd:TimbreFiscalDigital")[0];
+    datos["Folio Fiscal"] = timbreFiscal ? timbreFiscal.getAttribute("UUID") || "-" : "No disponible";
 
-    // RFC y Nombre
+    // 3. RFC y Nombre
     const tipoFactura = document.getElementById("factura").value;
     const entidad = tipoFactura === "emitida"
         ? comprobante.getElementsByTagName("cfdi:Receptor")[0]
@@ -281,65 +277,64 @@ function extraerDatosPagos(comprobante) {
         datos["Nombre"] = "No disponible";
     }
 
-    // Complemento de pagos
+    // 4. Extracción desde el Complemento de Pagos
     const complemento = comprobante.getElementsByTagName("cfdi:Complemento")[0];
     if (complemento) {
         const pagos = complemento.getElementsByTagName("pago20:Pagos")[0];
+        
         if (pagos) {
-            // Pago Individual
+            // B) Leer Datos de la Operación de Pago
             const pago = pagos.getElementsByTagName("pago20:Pago")[0];
             if (pago) {
-                datos["FormaDePagoP"] = obtenerDescripcionFormaPago(pago.getAttribute("FormaDePagoP"));
-                datos["FechaPago"] = pago.getAttribute("FechaPago") || "No disponible"; // Extraer FechaPago
-                datos["MontoTotalPagos"] = parseFloat(pago.getAttribute("Monto") || 0);
+                datos["Forma de Pago"] = obtenerDescripcionFormaPago(pago.getAttribute("FormaDePagoP"));
+                datos["Fecha Pago"] = pago.getAttribute("FechaPago") || "No disponible";
+                
+                if (!datos["Total"]) {
+                    datos["Total"] = parseFloat(pago.getAttribute("Monto") || 0).toFixed(2);
+                }
             }
+            
+            // A) Leer Totales (La fuente de la verdad para montos)
+            const totales = pagos.getElementsByTagName("pago20:Totales")[0];
+            if (totales) {
+                // Total
+                const totalMonto = parseFloat(totales.getAttribute("MontoTotalPagos")) || 0;
+                datos["Total"] = totalMonto > 0 ? totalMonto.toFixed(2) : "No disponible";
 
-            // Impuestos (ImpuestosP)
-            const impuestosP = pagos.getElementsByTagName("pago20:ImpuestosP")[0];
-            datos["IVA"] = 0;
-            datos["IEPS"] = 0;
-            datos["ISR"] = 0;
+                // IVA
+                const iva16 = parseFloat(totales.getAttribute("TotalTrasladosImpuestoIVA16")) || 0;
+                const iva8 = parseFloat(totales.getAttribute("TotalTrasladosImpuestoIVA8")) || 0;
+                const totalIva = iva16 + iva8;
+                datos["IVA"] = totalIva > 0 ? totalIva.toFixed(2) : "No disponible";
 
-            if (impuestosP) {
-                // Traslados
-                const trasladosP = impuestosP.getElementsByTagName("pago20:TrasladoP");
-                for (const traslado of trasladosP) {
-                    const impuesto = traslado.getAttribute("ImpuestoP");
-                    const importe = parseFloat(traslado.getAttribute("ImporteP")) || 0;
-
-                    if (impuesto === "002") {
-                        datos["IVA"] += importe;
-                    } else if (impuesto === "003") {
-                        datos["IEPS"] += importe;
+                // IEPS (Con Plan B de búsqueda profunda integrado)
+                let ieps = parseFloat(totales.getAttribute("TotalTrasladosImpuestoIEPS")) || 0;
+                if (ieps === 0 && pago) {
+                    const impuestosP = pago.getElementsByTagName("pago20:ImpuestosP")[0];
+                    if (impuestosP) {
+                        const trasladosP = impuestosP.getElementsByTagName("pago20:TrasladoP");
+                        for (const traslado of trasladosP) {
+                            if (traslado.getAttribute("ImpuestoP") === "003") {
+                                ieps += parseFloat(traslado.getAttribute("ImporteP")) || 0;
+                            }
+                        }
                     }
                 }
+                datos["IEPS"] = ieps > 0 ? ieps.toFixed(2) : "No disponible";
 
                 // Retenciones
-                const retencionesP = impuestosP.getElementsByTagName("pago20:RetencionP");
-                for (const retencion of retencionesP) {
-                    const impuesto = retencion.getAttribute("ImpuestoP");
-                    const importe = parseFloat(retencion.getAttribute("ImporteP")) || 0;
+                const retISR = parseFloat(totales.getAttribute("TotalRetencionesISR")) || 0;
+                datos["Ret ISR"] = retISR > 0 ? retISR.toFixed(2) : "No disponible";
 
-                    if (impuesto === "001") {
-                        datos["ISR"] += importe;
-                    }
+                const retIVA = parseFloat(totales.getAttribute("TotalRetencionesIVA")) || 0;
+                datos["Ret IVA"] = retIVA > 0 ? retIVA.toFixed(2) : "No disponible";
+
+                // NUEVO CÁLCULO DEL SUBTOTAL (Matemática Inversa Conciliada)
+                let subtotal = 0;
+                if (totalMonto > 0) {
+                    subtotal = totalMonto - totalIva - ieps + retISR + retIVA;
                 }
-            }
-
-            // Cálculo del Subtotal
-            const montoTotal = datos["MontoTotalPagos"];
-            const iva = datos["IVA"];
-            const ieps = datos["IEPS"];
-            const isr = datos["ISR"];
-
-            if (montoTotal > 0) {
-                if (iva > 0 || ieps > 0) {
-                    datos["Subtotal"] = (montoTotal - iva - ieps + isr).toFixed(2);
-                } else {
-                    datos["Subtotal"] = (montoTotal + isr).toFixed(2); // Caso sin IVA ni IEPS
-                }
-            } else {
-                datos["Subtotal"] = "No disponible";
+                datos["Subtotal"] = subtotal > 0 ? subtotal.toFixed(2) : "No disponible";
             }
         }
     }

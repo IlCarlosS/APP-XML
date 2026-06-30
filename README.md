@@ -1,6 +1,12 @@
 # Gestión de Facturas XML
 Este proyecto es una solución integral diseñada para automatizar la gestión de facturas electrónicas (CFDI SAT). Su objetivo principal es transformar datos brutos contenidos en archivos XML en información estructurada y exportarla a archivos excel .xlsx, eliminando el error humano y reduciendo drásticamente el tiempo de procesamiento administrativo.
 
+### Versión 1.4.0
+- Se añade función para leer y descomprimir archivos .zip (con archivos CFDI .xml)
+- Correción en errores de CDFI tipo complemento de pago, mejor lectura y extracción de datos de la estructura los archivos .xml.
+- Modificación logica de archivos: xml.js, scripts.js
+- Correciones menores de estructura de código.
+
 ## Funcionalidades Clave
 - **Procesamiento Inteligente de XML:** Carga masiva de archivos mediante Drag & Drop o selección directa. La aplicación valida la estructura del documento antes de iniciar la extracción.
 - **Extracción de Datos Dinámica:** Filtrado y selección de campos específicos. El usuario puede decidir qué información clave (montos, impuestos, emisores, fechas) desea procesar.
